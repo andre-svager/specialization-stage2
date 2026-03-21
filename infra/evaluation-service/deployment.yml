@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: evaluation-service
+  namespace: togglemaster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: evaluation-service
+  template:
+    metadata:
+      labels:
+        app: evaluation-service
+    spec:
+      containers:
+        - name: evaluation-service
+          image: togglemaster/evaluation-service:latest
+          ports:
+            - containerPort: 8004
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: EVALUATION_PORT
+          envFrom:
+            - configMapRef:
+                name: togglemaster-config
+            - secretRef:
+                name: togglemaster-secret

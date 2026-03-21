@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: target-service
+  namespace: togglemaster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: target-service
+  template:
+    metadata:
+      labels:
+        app: target-service
+    spec:
+      containers:
+        - name: target-service
+          image: togglemaster/target-service:latest
+          ports:
+            - containerPort: 8003
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: togglemaster-config
+                  key: TARGET_PORT
+          envFrom:
+            - configMapRef:
+                name: togglemaster-config
+            - secretRef:
+                name: togglemaster-secret

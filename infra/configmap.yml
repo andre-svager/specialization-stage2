@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: togglemaster-config
+  namespace: togglemaster
+data:
+
+  # ---- GLOBAL ----
+  AWS_REGION: "us-east-1"
+  AWS_SQS_URL: "https://sqs.us-east-1.amazonaws.com/xxx/evaluation-events"
+
+  # ---- ANALYTICS ----
+  ANALYTICS_PORT: "8005"
+  AWS_DYNAMODB_TABLE: "ToggleMasterAnalytics"
+  DYNAMODB_ENDPOINT: "http://analytics-db:8000"
+
+  # ---- AUTH ----
+  AUTH_PORT: "8001"
+  DATABASE_URL_AUTH: "postgresql://auth_user:auth_password@auth-db:5432/auth_db"
+
+  # ---- EVALUATION ----
+  EVALUATION_PORT: "8004"
+  REDIS_HOST: "evaluation-db"
+  REDIS_PORT: "6379"
+  FLAG_SERVICE_URL: "http://flag-service:8002"
+  TARGETING_SERVICE_URL: "http://target-service:8003"
+
+  # ---- FLAG ----
+  FLAG_PORT: "8002"
+  DATABASE_URL_FLAG: "postgresql://flag_user:flag_password@flag-db:5432/flag_db"
+
+  # ---- TARGET ----
+  TARGET_PORT: "8003"
+  DATABASE_URL_TARGET: "postgresql://target_user:target_password@target-db:5432/target_db"
+
+  # ---- INTERNAL SERVICE DISCOVERY ----
+  AUTH_SERVICE_URL: "http://auth-service:8001"
