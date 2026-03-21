@@ -3,7 +3,7 @@
 AUTH_URL="http://localhost:8001"
 FLAG_URL="http://localhost:8002"
 TARGET_URL="http://localhost:8003"
-FLAG_NAME="enable-feature-flag-5"
+FLAG_NAME="enable-feature-evaluation-6"
 
 MASTER_KEY="admin-secreto-123"
 
@@ -42,7 +42,7 @@ TARGET=$(curl -sS -f -X POST "$TARGET_URL/rules" \
 echo "$TARGET" | jq .
 
 echo ""
-echo "List Rules"
+echo "Get Rule"
 RULE=$(curl -sS -f "$TARGET_URL/rules/$FLAG_NAME" \
   -H "Authorization: Bearer $API_KEY")
 

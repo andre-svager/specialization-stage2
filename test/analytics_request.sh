@@ -7,7 +7,7 @@ EVAL_URL="http://localhost:8004"
 ANALYTICS_URL="http://localhost:8004"
 MASTER_KEY="admin-secreto-123"
 
-FLAG_NAME="enable-feature-evaluation"
+FLAG_NAME="enable-feature-evaluation-6"
 
 # -----------------------------
 # EVALUATION SERVICE
@@ -15,17 +15,6 @@ FLAG_NAME="enable-feature-evaluation"
 echo""
 echo -n "Starting analytics-service:"
 curl -sS -f "$ANALYTICS_URL/health" 
-
-echo ""
-CREATE_RESPONSE=$(curl -X POST "$AUTH_URL/admin/keys" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $MASTER_KEY" \
-  -d '{"name": "analytics-service-key"}')
-API_KEY=$(echo "$CREATE_RESPONSE" | jq -r '.key' 2>/dev/null)
-
-echo ""
-echo "Create API_KEY $API_KEY"
-
 
 echo "Evaluating flag for test users..."
 
