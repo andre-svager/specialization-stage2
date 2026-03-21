@@ -1,0 +1,35 @@
+# ---------- Builder ----------
+FROM golang:1.22-alpine AS builder
+
+WORKDIR /app
+
+# Install git (needed for some Go modules)
+RUN apk add --no-cache git
+
+# Copy dependency files first (better cache)
+COPY go.mod go.sum ./
+# Download deps (IMPORTANT)
+RUN go mod download
+
+# Copy source
+COPY . .
+
+# Build static binary
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o evaluation-service .
+
+# ---------- Runtime ----------
+FROM alpine:3.20
+
+WORKDIR /app
+
+# Install certificates (important for HTTP/DB connections)
+RUN apk add --no-cache ca-certificates wget
+
+# Copy binary from builder
+COPY --from=builder /app/evaluation-service /app/evaluation-service
+
+# Expose your app port
+EXPOSE 8004
+
+# Run the app
+CMD ["/app/evaluation-service"]

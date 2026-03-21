@@ -1,0 +1,53 @@
+# ===========================
+# General
+# ===========================
+.DS_Store
+*.log
+*.tmp
+*.swp
+*.bak
+.idea/
+.vscode/
+*.env
+
+# ===========================
+# Python
+# ===========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pytest_cache/
+.venv/
+.env
+
+# ===========================
+# Go
+# ===========================
+/bin/
+/obj/
+*.exe
+*.test
+*.out
+
+# ===========================
+# Docker / Localstack / Containers
+# ===========================
+docker-compose.override.yml
+localstack_data/
+*.tar
+*.pid
+
+# ===========================
+# Redis / DB / caches
+# ===========================
+*.rdb
+*.aof
+*.db
+
+# ===========================
+# Other
+# ===========================
+*.zip
+*.tar.gz
+*.egg-info/
