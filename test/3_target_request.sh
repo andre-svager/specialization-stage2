@@ -3,10 +3,9 @@
 AUTH_URL="http://localhost:8001"
 FLAG_URL="http://localhost:8002"
 TARGET_URL="http://localhost:8003"
-FLAG_NAME="enable-feature-evaluation-12"
-
 MASTER_KEY="admin-secreto-123"
 
+FLAG_NAME="enable-feature-stage"
 
 # -----------------------------
 # TARGET SERVICE
@@ -21,6 +20,7 @@ CREATE_RESPONSE=$(curl -X POST "$AUTH_URL/admin/keys" \
   -H "Authorization: Bearer $MASTER_KEY" \
   -d '{"name": "target-service-key"}')
 API_KEY=$(echo "$CREATE_RESPONSE" | jq -r '.key' 2>/dev/null)
+
 
 echo ""
 echo "Create API_KEY $API_KEY"

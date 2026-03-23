@@ -14,7 +14,7 @@ curl -s "$AUTH_URL/health"
 CREATE_RESPONSE=$(curl -X POST "$AUTH_URL/admin/keys" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $MASTER_KEY" \
-  -d '{"name": "evaluation-service-key"}')
+  -d '{"name": "auth-service-key"}')
 
 echo ""
 echo -n "RAW RESPONSE:$CREATE_RESPONSE"

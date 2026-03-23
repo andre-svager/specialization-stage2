@@ -29,6 +29,21 @@ kubectl logs -n togglemaster <pod-name>
 ### Port forward to test locally
 kubectl port-forward -n togglemaster svc/auth-service 8001:8001
 
+# Ver pods escalando
+watch "kubectl get pods -n togglemaster -l app=analytics-service"
+
+# Ver HPA status
+kubectl get hpa -n togglemaster
+
+# Ver ScaleObject
+kubectl get scaledobjects -n togglemaster
+
+# Ver fila SQS
+aws sqs get-queue-attributes \
+  --queue-url https://sqs.us-east-1.amazonaws.com/973397181776/evaluation-events \
+  --attribute-names ApproximateNumberOfMessages \
+  --region us-east-1
+
 
 Your current IAM principal doesn't have access to Kubernetes objects on this cluster.
 This might be due to the current principal not having an IAM access entry with permissions to access the cluster.

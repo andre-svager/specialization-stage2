@@ -2,9 +2,9 @@
 
 AUTH_URL="http://localhost:8001"
 FLAG_URL="http://localhost:8002"
-FLAG_NAME="enable-feature-evaluation-12"
-
 MASTER_KEY="admin-secreto-123"
+
+FLAG_NAME="enable-feature-stage"
 
 # -----------------------------
 # FLAG SERVICE
@@ -48,3 +48,5 @@ DIS_FLAGS=$(curl -sS -f -X PUT "$FLAG_URL/flags/$FLAG_NAME" \
   -H "Authorization: Bearer $API_KEY" \
   -d '{"is_enabled": true}')
 echo "$DIS_FLAGS" | jq .
+
+

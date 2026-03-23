@@ -30,3 +30,6 @@ data:
   TARGET_PORT: "8003"
   DATABASE_URL_TARGET: "postgresql://target_user:target_password@tm-db.cgx4okc4isem.us-east-1.rds.amazonaws.com:5432/target_db"
   AUTH_SERVICE_URL: "http://auth-service:8001"
+  MASTER_KEY: "admin-secreto-123"
+
+  SERVICE_API_KEY: "tm_key_53ed2f650f6a5d2131e3d94b5cfeab31af3a1106f68493ca35d5440eb222d3ee"

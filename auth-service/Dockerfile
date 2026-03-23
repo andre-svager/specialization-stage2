@@ -1,5 +1,5 @@
 # ---------- Builder ----------
-FROM golang:1.22-alpine AS builder
+FROM golang:1.21.3-alpine3.18 AS builder
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
     go build -ldflags="-s -w" -o auth-service
 
 # ---------- Runtime ----------
-FROM gcr.io/distroless/static:nonroot
+FROM gcr.io/distroless/static:nonroot-amd64
 
 WORKDIR /app
 

@@ -7,7 +7,7 @@ EVAL_URL="http://localhost:8004"
 ANALYTICS_URL="http://localhost:8005"
 MASTER_KEY="admin-secreto-123"
 
-FLAG_NAME="enable-feature-evaluation-12"
+FLAG_NAME="enable-feature-stage"
 
 # -----------------------------
 # EVALUATION SERVICE
@@ -33,3 +33,9 @@ CACHE_TEST=$(curl -s "$EVAL_URL/evaluate?user_id=$USER1&flag_name=$FLAG_NAME")
 echo "Repeat evaluation User $USER1: $CACHE_TEST"
 
 echo "Evaluation events should now be visible in your SQS queue."
+
+
+
+
+curl -s "http://localhost:8004/evaluate?user_id=user-123&flag_name=enable-feature-evaluation-20"
+echo "User $USER1: $RESULT1"

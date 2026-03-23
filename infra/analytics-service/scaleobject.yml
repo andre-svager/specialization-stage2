@@ -15,7 +15,5 @@ spec:
       queueLength: "5"
       awsRegion: "us-east-1"
       identityOwner: "workload"
-    authenticationRef:
-      name: analytics-sqs-auth
   pollingInterval: 10
   cooldownPeriod: 300
