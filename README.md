@@ -17,13 +17,13 @@ ToggleMaster is a distributed system for managing feature flags with:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    AWS Load Balancer (ALB)                   │
-│        aae373c8b4cdf4430b4aebb82d8b97d1.elb.us-east-1    │
+│                    AWS Load Balancer (ALB)                  │
+│                     xxx.elb.us-east-1                       │
 └──────────┬──────────────────────────────────────────────────┘
            │
 ┌──────────┴───────────────────────────────────────────────────┐
-│                  NGINX Ingress Controller                     │
-│              (Path-based routing to services)                 │
+│                  NGINX Ingress Controller                    │
+│              (Path-based routing to services)                │
 └──────────┬──────────────────────────────────────────────────┘
            │
     ┌──────┼──────┬──────────┬──────────┐
