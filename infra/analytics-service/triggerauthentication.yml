@@ -1,0 +1,13 @@
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: analytics-sqs-auth
+  namespace: togglemaster
+spec:
+  secretTargetRef:
+    - parameter: awsAccessKeyID
+      name: analytics-secret-sqs
+      key: AWS_ACCESS_KEY_ID
+    - parameter: awsSecretAccessKey
+      name: analytics-secret-sqs
+      key: AWS_SECRET_ACCESS_KEY

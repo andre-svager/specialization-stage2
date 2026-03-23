@@ -103,3 +103,6 @@ INFO:Evento ... (Flag: enable-new-dashboard) salvo no DynamoDB.
 Vá até o console da AWS, abra o **DynamoDB**, selecione a tabela `ToggleMasterAnalytics` e clique em "Explore table items".
 
 Você verá os itens que o worker acabou de inserir.
+
+**5. Atualizar somente o container caso necessario:**
+docker compose up -d --no-deps --build analytics-service 

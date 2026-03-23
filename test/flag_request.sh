@@ -2,7 +2,7 @@
 
 AUTH_URL="http://localhost:8001"
 FLAG_URL="http://localhost:8002"
-FLAG_NAME="enable-feature-evaluation-6"
+FLAG_NAME="enable-feature-evaluation-12"
 
 MASTER_KEY="admin-secreto-123"
 

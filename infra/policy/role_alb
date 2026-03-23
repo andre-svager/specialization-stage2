@@ -1,0 +1,47 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::973397181776:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/$(aws eks describe-cluster --name tm --region us-east-1 --query 'cluster.identity.oidc.issuer' --output text | cut -d '/' -f 5)"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.us-east-1.amazonaws.com/id/$(aws eks describe-cluster --name tm --region us-east-1 --query 'cluster.identity.oidc.issuer' --output text | cut -d '/' -f 5):aud": "sts.amazonaws.com",
+          "oidc.eks.us-east-1.amazonaws.com/id/$(aws eks describe-cluster --name tm --region us-east-1 --query 'cluster.identity.oidc.issuer' --output text | cut -d '/' -f 5):sub": "system:serviceaccount:ingress-nginx:nginx-ingress"
+        }
+      }
+    }
+  ]
+}
+
+
+OIDC_ID=$(aws eks describe-cluster --name tm --region us-east-1 --query 'cluster.identity.oidc.issuer' --output text | cut -d '/' -f 5)
+
+cat > /tmp/trust-policy-final.json << EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::973397181776:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/$OIDC_ID"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.us-east-1.amazonaws.com/id/$OIDC_ID:aud": "sts.amazonaws.com",
+          "oidc.eks.us-east-1.amazonaws.com/id/$OIDC_ID:sub": "system:serviceaccount:ingress-nginx:nginx-ingress"
+        }
+      }
+    }
+  ]
+}
+EOF
+
+aws iam create-role \
+  --role-name EKSNginxIngressRole \
+  --assume-role-policy-document file:///tmp/trust-policy-final.json \
+  --region us-east-1 2>&1 | grep "RoleName" || echo "Role creation initiated"

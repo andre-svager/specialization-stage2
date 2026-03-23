@@ -1,138 +1,83 @@
 #!/bin/bash
 
-AUTH_URL="http://localhost:8001"
-FLAG_URL="http://localhost:8002"
-TARGET_URL="http://localhost:8003"
-EVAL_URL="http://localhost:8004"
-FLAG_NAME="enable-feature-a2"
-
-MASTER_KEY="admin-secreto-123"
-
-# -----------------------------
-# AUTH SERVICE
-# -----------------------------
-echo -n "Starting auth-service: "
-curl -s "$FLAG_URL/health"
-echo ""
-echo "Creating API key..."
-
-CREATE_RESPONSE=$(curl -X POST "$AUTH_URL/admin/keys" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $MASTER_KEY" \
-  -d '{"name": "evaluation-service-key"}')
-  #-d '{"name": "test-service"}')
-
-echo -n "RAW RESPONSE:$CREATE_RESPONSE"
+curl -s http://aae373c8b4cdf4430b4aebb82d8b97d1-bb79570497308936.elb.us-east-1.amazonaws.com/evaluation/health 
+curl -s http://aae373c8b4cdf4430b4aebb82d8b97d1-bb79570497308936.elb.us-east-1.amazonaws.com/analytics/health 
 echo ""
 
-API_KEY=$(echo "$CREATE_RESPONSE" | jq -r '.key' 2>/dev/null)
-
-curl "$AUTH_URL/validate" \
-  -H "Authorization: Bearer $API_KEY"
-echo ""
+curl -s http://aae373c8b4cdf4430b4aebb82d8b97d1-bb79570497308936.elb.us-east-1.amazonaws.com/flag/health 
+curl -s http://aae373c8b4cdf4430b4aebb82d8b97d1-bb79570497308936.elb.us-east-1.amazonaws.com/target/health
+curl -s http://aae373c8b4cdf4430b4aebb82d8b97d1-bb79570497308936.elb.us-east-1.amazonaws.com/auth/health
 
 
-# -----------------------------
-# FLAG SERVICE
-# -----------------------------
-echo -n "Starting flag-service:"
-curl -s "$FLAG_URL/health"
 
-curl -sS -f -X POST "$FLAG_URL/flags" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $API_KEY" \
-  -d '{
-    "name": "'"$FLAG_NAME"'",
-    "description": "Ativa nova Feature",
-    "is_enabled": false
-}'
+# Resumo: Fase 5 - NGINX Ingress Controller com IRSA ✅
+# Após todos os 5 serviços estarem rodando, foi implementada a exposição externa via Load Balancer:
 
-FLAGS=$(curl -sS -f "$FLAG_URL/flags" \
-  -H "Authorization: Bearer $API_KEY")
+# 1. Problema Identificado
+# Serviços só acessíveis internamente (ClusterIP)
+# Precisava de Load Balancer para acesso externo
+# Usuário solicitou NGINX Ingress com IRSA (sem Helm)
+# 2. IAM Setup (IRSA)
 
-echo "$FLAGS" | jq .
+# ✓ Criado IAM Policy: EKSNginxIngressPolicy  - Permissões ELBv2 (CreateLoadBalancer, CreateTargetGroup, CreateListener, etc)  - Permissões EC2 (DescribeSecurityGroups, DescribeSubnets)  ✓ Criado IAM Role: EKSNginxIngressRole  - Trust policy com OIDC do EKS (sem credenciais hardcoded)  ✓ Policy anexada à Role
+# 3. NGINX Ingress Controller (sem Helm)
 
-echo "Enabling Flag"
-curl -sS -f -X PUT "$FLAG_URL/flags/$FLAG_NAME" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $API_KEY" \
-  -d '{"is_enabled": true}'
-echo""
+# ✓ Instalado via kubectl apply (manifesto oficial AWS)  - Namespace: ingress-nginx  - Pod: ingress-nginx-controller → Running  ✓ Patchted ServiceAccount com IRSA annotation  - eks.amazonaws.com/role-arn: arn:aws:iam::973397181776:role/EKSNginxIngressRole
+# 4. AWS ALB Criado Automaticamente ✓
 
+# DNS: aae373c8b4cdf4430b4aebb82d8b97d1-bb79570497308936.elb.us-east-1.amazonaws.comType: Network Load BalancerPorts: 80, 443Status: Active
+# 5. Ingress Manifest com Roteamento
+# ingress.yaml criado com:
 
-# -----------------------------
-# TARGET SERVICE
-# -----------------------------
-echo -n "Starting target-service:"
-curl -sS -f "$TARGET_URL/health" 
+# Rota	Serviço	Porta
+# /auth/*	auth-service	8001
+# /flag/*	flag-service	8002
+# /target/*	target-service	8003
+# /evaluation/*	evaluation-service	8004
+# /analytics/*	analytics-service	8005
+# Regex Rewriting: /auth/health → reescreve para /health antes de rotear
 
-curl -sS -f -X POST "$TARGET_URL/rules" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $API_KEY" \
-  -d '{
-    "flag_name": "'"$FLAG_NAME"'",
-    "is_enabled": true,
-    "rules": {
-        "type": "PERCENTAGE",
-        "value": 50
-    }
-}'
+# 6. Testes Executados ✅
 
-RULE=$(curl -sS -f "$TARGET_URL/rules/$FLAG_NAME" \
-  -H "Authorization: Bearer $API_KEY")
+# ✓ http://ALB/auth/health       → {"status":"ok"} 200✓ http://ALB/flag/health       → {"status":"ok"} 200✓ http://ALB/target/health     → {"status":"ok"} 200✓ http://ALB/evaluation/health → {"status":"ok"} 200✓ http://ALB/analytics/health  → {"status":"ok"} 200
+# Resultado Final
+# ✅ ToggleMaster completamente exposto externamente com:
 
-echo "$RULE" | jq .
-
-echo "Updating Rule to 75%"
-curl -sS -f -X PUT "$TARGET_URL/rules/$FLAG_NAME" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $API_KEY" \
-  -d '{
-    "rules": {
-        "type": "PERCENTAGE",
-        "value": 75
-    }
-}' 
+# Load Balancer automático (ALB)
+# IRSA para segurança (sem credenciais)
+# Path-based routing para 5 serviços
+# Todos respondendo via DNS público
 
 
-# -----------------------------
-# EVALUATION SERVICE
-# -----------------------------
-
- EVALUATION_RESPONSE=$(curl -X POST "$AUTH_URL/admin/keys" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $MASTER_KEY" \
-  -d '{"name": "evaluation-service-key"}')
-
-API_KEY_EVAL=$(echo "$EVALUATION_RESPONSE" | jq -r '.key' 2>/dev/null)   
-echo -n "EVALUATION KEY:$API_KEY_EVAL"
-
-echo""
-echo "Update Evaluation SERVICE_API_KEY them Press Enter to continue..."
-read
-
-echo "Checking evaluation-service health..."
-HEALTH=$(curl -s "$EVAL_URL/health")
-echo "Health: $HEALTH"
-
-echo "Evaluating flag for test users..."
-
-# Test User 1
-USER1="user-123"
-RESULT1=$(curl -s "$EVAL_URL/evaluate?user_id=$USER1&flag_name=$FLAG_NAME")
-echo "User $USER1: $RESULT1"
-
-# Test User 2
-USER2="user-abc"
-RESULT2=$(curl -s "$EVAL_URL/evaluate?user_id=$USER2&flag_name=$FLAG_NAME")
-echo "User $USER2: $RESULT2"
-
-echo "Running cache test (repeat evaluation for User 1)..."
-CACHE_TEST=$(curl -s "$EVAL_URL/evaluate?user_id=$USER1&flag_name=$FLAG_NAME")
-echo "Repeat evaluation User $USER1: $CACHE_TEST"
-
-echo "Evaluation events should now be visible in your SQS queue."
 
 
-echo ""
-read -p "Press enter to exit"
+# 🎉 Perfeito! NGINX Ingress Controller está 100% funcional!
+
+# Resumo do Setup NGINX + IRSA:
+# ✅ Instalado sem Helm:
+
+# NGINX Ingress Controller via kubectl apply
+# Namespace: ingress-nginx
+# Pod: ingress-nginx-controller → Running
+# ✅ IRSA Configurado:
+
+# IAM Policy: EKSNginxIngressPolicy (permissões ELBv2, EC2, Load Balancing)
+# IAM Role: EKSNginxIngressRole (trust policy OIDC)
+# ServiceAccount: ingress-nginx com anotação eks.amazonaws.com/role-arn
+# Pod agora pode gerenciar ALB sem credenciais hardcoded
+# ✅ ALB Criado Automaticamente:
+
+
+# DNS: aae373c8b4cdf4430b4aebb82d8b97d1-bb79570497308936.elb.us-east-1.amazonaws.comType: Network Load Balancer (AWS ALB)Ports: 80, 443 (configuráveis)
+# ✅ Ingress Manifest com Roteamento:
+
+# /auth/* → auth-service:8001
+# /flag/* → flag-service:8002
+# /target/* → target-service:8003
+# /evaluation/* → evaluation-service:8004
+# /analytics/* → analytics-service:8005
+# ✅ Path Rewriting Funcionando:
+
+# Regex: /auth(/|$)(.*) reescreve para /$2
+# Exemplo: /auth/health → Reescreve para /health → Serviço recebe /health
+# ✅ Todos os serviços respondendo:

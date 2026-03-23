@@ -3,35 +3,26 @@ FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
 
-# Install git (needed for some Go modules)
 RUN apk add --no-cache git
 
-# Copy dependency files first (better cache)
 COPY go.mod go.sum ./
-# Download deps (IMPORTANT)
 RUN go mod download
 
-# Copy source
 COPY . .
 
-# Build static binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o auth-service .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
+    go build -ldflags="-s -w" -o auth-service
 
 # ---------- Runtime ----------
-FROM alpine:3.20
+FROM gcr.io/distroless/static:nonroot
 
 WORKDIR /app
 
-# Install certificates (important for HTTP/DB connections)
-RUN apk add --no-cache ca-certificates
-
-# Copy binary from builder
 COPY --from=builder /app/auth-service /app/auth-service
+COPY --from=builder /app/db/init.sql /app/db/init.sql
 
-COPY --from=builder /app/db/init.sql ./db/init.sql
-
-# Expose your app port
 EXPOSE 8001
 
-# Run the app
+USER nonroot:nonroot
+
 CMD ["/app/auth-service"]

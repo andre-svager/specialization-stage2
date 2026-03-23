@@ -84,24 +84,24 @@ services:
 # -----------------------------
 # LOCALSTACK (SQS + DYNAMODB)
 # -----------------------------
-  localstack:
-    image: localstack/localstack:latest
-    container_name: togglemaster-localstack
-    ports:
-      - "4566:4566"
-    environment:
-      SERVICES: sqs,dynamodb
-      AWS_DEFAULT_REGION: us-east-1   
-      AWS_ACCESS_KEY_ID: test
-      AWS_SECRET_ACCESS_KEY: test
-      AWS_ENDPOINT_URL: http://localstack:4566
-      DEBUG: 1
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./infra/localstack:/etc/localstack/init/ready.d
-      - localstack_data:/var/lib/localstack
-    networks:
-      - togglemaster-net
+  # localstack:
+  #   image: localstack/localstack:latest
+  #   container_name: togglemaster-localstack
+  #   ports:
+  #     - "4566:4566"
+  #   environment:
+  #     SERVICES: dynamodb
+  #     #AWS_DEFAULT_REGION: us-east-1   
+  #     #AWS_ACCESS_KEY_ID: test
+  #     #AWS_SECRET_ACCESS_KEY: test
+  #     #AWS_ENDPOINT_URL: http://localstack:4566
+  #     #DEBUG: 1
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ./infra/localstack:/etc/localstack/init/ready.d
+  #     - localstack_data:/var/lib/localstack
+  #   networks:
+  #     - togglemaster-net
 
   # -----------------------------
   # AUTH SERVICE
@@ -228,7 +228,7 @@ volumes:
   target_data:
   evaluation_data:
   analytics_data:
-  localstack_data:
+  #localstack_data:
 
 # -----------------------------
 # NETWORK

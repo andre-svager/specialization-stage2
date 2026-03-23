@@ -1,6 +1,6 @@
 #!/bin/bash
 
-awslocal sqs create-queue --queue-name evaluation-events
+#awslocal sqs create-queue --queue-name evaluation-events
 
 awslocal dynamodb create-table \
   --table-name ToggleMasterAnalytics \

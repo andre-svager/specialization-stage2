@@ -6,7 +6,7 @@ TARGET_URL="http://localhost:8003"
 EVAL_URL="http://localhost:8004"
 MASTER_KEY="admin-secreto-123"
 
-FLAG_NAME="enable-feature-evaluation-6"
+FLAG_NAME="enable-feature-evaluation-12"
 
 # -----------------------------
 # EVALUATION SERVICE
