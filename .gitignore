@@ -51,3 +51,4 @@ localstack_data/
 *.zip
 *.tar.gz
 *.egg-info/
+secret.yml

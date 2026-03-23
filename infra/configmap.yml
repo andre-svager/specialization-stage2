@@ -4,34 +4,32 @@ metadata:
   name: togglemaster-config
   namespace: togglemaster
 data:
-
   # ---- GLOBAL ----
   AWS_REGION: "us-east-1"
-  AWS_SQS_URL: "https://sqs.us-east-1.amazonaws.com/xxx/evaluation-events"
+  AWS_SQS_URL: "https://sqs.us-east-1.amazonaws.com/973397181776/evaluation-events"
 
   # ---- ANALYTICS ----
   ANALYTICS_PORT: "8005"
   AWS_DYNAMODB_TABLE: "ToggleMasterAnalytics"
-  DYNAMODB_ENDPOINT: "http://analytics-db:8000"
 
   # ---- AUTH ----
   AUTH_PORT: "8001"
-  DATABASE_URL_AUTH: "postgresql://auth_user:auth_password@auth-db:5432/auth_db"
-
+  DATABASE_URL_AUTH: "postgresql://auth_user:auth_password@tm-db.cgx4okc4isem.us-east-1.rds.amazonaws.com:5432/auth_db"
   # ---- EVALUATION ----
   EVALUATION_PORT: "8004"
-  REDIS_HOST: "evaluation-db"
+  REDIS_HOST: "tm-redis.hnltzj.0001.use1.cache.amazonaws.com"
   REDIS_PORT: "6379"
+  REDIS_URL: "redis://tm-redis.hnltzj.0001.use1.cache.amazonaws.com:6379"
   FLAG_SERVICE_URL: "http://flag-service:8002"
   TARGETING_SERVICE_URL: "http://target-service:8003"
 
   # ---- FLAG ----
   FLAG_PORT: "8002"
-  DATABASE_URL_FLAG: "postgresql://flag_user:flag_password@flag-db:5432/flag_db"
-
+  DATABASE_URL_FLAG: "postgresql://flag_user:flag_password@tm-db.cgx4okc4isem.us-east-1.rds.amazonaws.com:5432/flag_db"
   # ---- TARGET ----
   TARGET_PORT: "8003"
-  DATABASE_URL_TARGET: "postgresql://target_user:target_password@target-db:5432/target_db"
-
-  # ---- INTERNAL SERVICE DISCOVERY ----
+  DATABASE_URL_TARGET: "postgresql://target_user:target_password@tm-db.cgx4okc4isem.us-east-1.rds.amazonaws.com:5432/target_db"
   AUTH_SERVICE_URL: "http://auth-service:8001"
+  MASTER_KEY: "admin-secreto-123"
+
+  SERVICE_API_KEY: "tm_key_53ed2f650f6a5d2131e3d94b5cfeab31af3a1106f68493ca35d5440eb222d3ee"

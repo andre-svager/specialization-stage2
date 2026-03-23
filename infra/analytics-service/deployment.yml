@@ -4,7 +4,6 @@ metadata:
   name: analytics-service
   namespace: togglemaster
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: analytics-service
@@ -13,11 +12,35 @@ spec:
       labels:
         app: analytics-service
     spec:
+      serviceAccountName: analytics-service
       containers:
         - name: analytics-service
-          image: togglemaster/analytics-service:latest
+          image: 973397181776.dkr.ecr.us-east-1.amazonaws.com/analytics-service:latest
           ports:
             - containerPort: 8005
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8005
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8005
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
           env:
             - name: PORT
               valueFrom:
@@ -28,4 +51,4 @@ spec:
             - configMapRef:
                 name: togglemaster-config
             - secretRef:
-                name: togglemaster-secret
+                name: analytics-secret

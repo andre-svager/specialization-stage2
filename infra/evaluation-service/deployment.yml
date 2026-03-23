@@ -13,11 +13,35 @@ spec:
       labels:
         app: evaluation-service
     spec:
+      serviceAccountName: evaluation-service
       containers:
         - name: evaluation-service
-          image: togglemaster/evaluation-service:latest
+          image: 973397181776.dkr.ecr.us-east-1.amazonaws.com/evaluation-service:latest
           ports:
             - containerPort: 8004
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8004
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
           env:
             - name: PORT
               valueFrom:
@@ -28,4 +52,4 @@ spec:
             - configMapRef:
                 name: togglemaster-config
             - secretRef:
-                name: togglemaster-secret
+                name: evaluation-secret

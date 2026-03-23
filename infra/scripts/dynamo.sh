@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TABLE_NAME="analytics-events"
+TABLE_NAME="ToggleMasterAnalytics"
 
 echo "Creating DynamoDB table: $TABLE_NAME"
 

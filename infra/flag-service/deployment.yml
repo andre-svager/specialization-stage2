@@ -15,9 +15,32 @@ spec:
     spec:
       containers:
         - name: flag-service
-          image: togglemaster/flag-service:latest
+          image: 973397181776.dkr.ecr.us-east-1.amazonaws.com/flag-service:latest
           ports:
             - containerPort: 8002
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
           env:
             - name: PORT
               valueFrom:
@@ -28,4 +51,4 @@ spec:
             - configMapRef:
                 name: togglemaster-config
             - secretRef:
-                name: togglemaster-secret
+                name: flag-secret
